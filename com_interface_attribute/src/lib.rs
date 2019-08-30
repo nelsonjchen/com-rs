@@ -155,7 +155,18 @@ fn gen_vtable(itf: &ItemTrait) -> HelperTokenStream {
                 #methods
             }
         )
+    } else if itf.supertraits.len() == 0 {
+        // Inherits from IUnknown.
+        quote!(
+            #[allow(non_snake_case)]
+            #[repr(C)]
+            pub struct #vtable_ident {
+                pub base: <dyn IUnknown as ComInterface>::VTable,
+                #methods
+            }
+        )
     } else {
+        // Inherits from another interface.
         assert!(itf.supertraits.len() == 1);
 
         let base_trait_ident = match itf.supertraits.first().unwrap() {
@@ -242,6 +253,7 @@ fn gen_raw_type(t: &Type) -> HelperTokenStream {
 
 fn gen_comptr_impl(itf: &ItemTrait) -> HelperTokenStream {
     let trait_ident = &itf.ident;
+
     let mut impl_methods: Vec<HelperTokenStream> = Vec::new();
 
     for trait_item in &itf.items {
@@ -253,11 +265,20 @@ fn gen_comptr_impl(itf: &ItemTrait) -> HelperTokenStream {
         }
     }
 
-    quote!(
-        impl <T: #trait_ident + ComInterface + ?Sized> #trait_ident for ComPtr<T> {
-            #(#impl_methods)*
-        }
-    )
+    if trait_ident.to_string().to_uppercase() == "IUNKNOWN" {
+        quote!(
+            impl <T: ComInterface + ?Sized> #trait_ident for ComPtr<T> {
+                #(#impl_methods)*
+            }
+        )
+    } else {
+        quote!(
+            impl <T: #trait_ident + ComInterface + ?Sized> #trait_ident for ComPtr<T> {
+                #(#impl_methods)*
+            }
+        )
+    }
+
 }
 
 fn gen_comptr_impl_method(trait_ident: &Ident, method: &TraitItemMethod) -> HelperTokenStream {

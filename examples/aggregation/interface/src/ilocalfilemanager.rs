@@ -9,7 +9,7 @@ pub const IID_ILOCAL_FILE_MANAGER: IID = IID {
     Data4: [0xb1, 0x08, 0x78, 0x95, 0xb0, 0xaf, 0x21, 0xad],
 };
 
-pub trait ILocalFileManager: IUnknown {
+pub trait ILocalFileManager {
     fn delete_local(&mut self) -> HRESULT;
 }
 

@@ -6,7 +6,7 @@ use winapi::shared::minwindef::BOOL;
 use winapi::shared::ntdef::HRESULT;
 
 #[com_interface(00000001-0000-0000-c000-000000000046)]
-pub trait IClassFactory: IUnknown {
+pub trait IClassFactory {
     fn create_instance(
         &mut self,
         aggr: *mut IUnknownVPtr,

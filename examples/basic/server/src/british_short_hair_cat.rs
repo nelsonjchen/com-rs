@@ -1,4 +1,4 @@
-use com::{iunknown_gen_vtable, IUnknown, IUnknownVPtr, IUnknownVTable, IID_IUNKNOWN};
+use com::{iunknown_gen_vtable, IUnknown, IUnknownVPtr, IUnknownVTable, IID_IUNKNOWN, CoClass, ComBox,};
 use interface::{
     ianimal::{IAnimal, IAnimalVPtr, IAnimalVTable, IID_IANIMAL},
     ianimal_gen_vtable,
@@ -22,19 +22,7 @@ use winapi::{
 /// https://en.wikipedia.org/wiki/British_Shorthair
 #[repr(C)]
 pub struct BritishShortHairCat {
-    // inner must always be first because Cat is actually an ICat with one extra field at the end
-    inner_one: ICatVPtr,
-    inner_two: IDomesticAnimalVPtr,
-    ref_count: u32,
-}
-
-impl Drop for BritishShortHairCat {
-    fn drop(&mut self) {
-        let _ = unsafe {
-            Box::from_raw(self.inner_one as *mut ICatVTable);
-            Box::from_raw(self.inner_two as *mut IDomesticAnimalVTable);
-        };
-    }
+    food: u32,
 }
 
 impl IDomesticAnimal for BritishShortHairCat {
@@ -58,8 +46,24 @@ impl IAnimal for BritishShortHairCat {
     }
 }
 
-impl IUnknown for BritishShortHairCat {
-    fn query_interface(&mut self, riid: *const IID, ppv: *mut *mut c_void) -> HRESULT {
+pub struct BritishShortHairCatVPointerList {
+    icat: ICatVPtr,
+    idomesticanimal: IDomesticAnimalVPtr,
+}
+
+impl Drop for BritishShortHairCatVPointerList {
+    fn drop(&mut self) {
+        let _ = unsafe {
+            Box::from_raw(self.icat as *mut ICatVTable);
+            Box::from_raw(self.idomesticanimal as *mut IDomesticAnimalVTable);
+        };
+    }
+}
+
+impl CoClass for BritishShortHairCat {
+    type VPointerList = BritishShortHairCatVPointerList;
+
+    fn query_interface(vtbl_list: &Self::VPointerList, riid: *const IID, ppv: *mut *mut c_void) -> HRESULT {
         /* TODO: This should be the safe wrapper. You shouldn't need to write unsafe code here. */
         unsafe {
             let riid = &*riid;
@@ -68,50 +72,37 @@ impl IUnknown for BritishShortHairCat {
                 | IsEqualGUID(riid, &IID_ICAT)
                 | IsEqualGUID(riid, &IID_IANIMAL)
             {
-                *ppv = &self.inner_one as *const _ as *mut c_void;
+                *ppv = &vtbl_list.icat as *const _ as *mut c_void;
             } else if IsEqualGUID(riid, &IID_IDOMESTIC_ANIMAL) {
-                *ppv = &self.inner_two as *const _ as *mut c_void;
+                *ppv = &vtbl_list.idomesticanimal as *const _ as *mut c_void;
             } else {
                 println!("Returning NO INTERFACE.");
+                *ppv = std::ptr::null_mut::<c_void>();
                 return E_NOINTERFACE;
             }
 
             println!("Successful!.");
-            self.add_ref();
             NOERROR
         }
     }
 
-    fn add_ref(&mut self) -> u32 {
-        self.ref_count += 1;
-        println!("Count now {}", self.ref_count);
-        self.ref_count
-    }
+    fn create_vtable_list() -> Self::VPointerList {
+        let icat_vtable = icat_gen_vtable!(ComBox<BritishShortHairCat>, 0);
+        let icat_vptr = Box::into_raw(Box::new(icat_vtable));
+        let idomesticanimal_vtable = idomesticanimal_gen_vtable!(ComBox<BritishShortHairCat>, 1);
+        let idomesticanimal_vptr = Box::into_raw(Box::new(idomesticanimal_vtable));
 
-    fn release(&mut self) -> u32 {
-        self.ref_count -= 1;
-        println!("Count now {}", self.ref_count);
-        let count = self.ref_count;
-        if count == 0 {
-            println!("Count is 0 for BritishShortHairCat. Freeing memory...");
-            drop(self)
+        BritishShortHairCatVPointerList {
+            icat: icat_vptr,
+            idomesticanimal: idomesticanimal_vptr,
         }
-        count
     }
 }
 
 impl BritishShortHairCat {
     pub(crate) fn new() -> BritishShortHairCat {
-        println!("Allocating new Vtable...");
-        let icat_vtable = icat_gen_vtable!(BritishShortHairCat, 0);
-        let icat_vptr = Box::into_raw(Box::new(icat_vtable));
-        let idomesticanimal_vtable = idomesticanimal_gen_vtable!(BritishShortHairCat, 1);
-        let idomesticanimal_vptr = Box::into_raw(Box::new(idomesticanimal_vtable));
-
         BritishShortHairCat {
-            inner_one: icat_vptr,
-            inner_two: idomesticanimal_vptr,
-            ref_count: 0,
+            food: 0,
         }
     }
 }

@@ -20,15 +20,15 @@ macro_rules! iunknown_gen_vtable {
             ppv: *mut *mut c_void,
         ) -> HRESULT {
             let this = this.sub($offset) as *mut $type;
-            (*this).query_interface(riid, ppv)
+            (*this).combox_query_interface(riid, ppv)
         }
         unsafe extern "stdcall" fn iunknown_add_ref(this: *mut IUnknownVPtr) -> u32 {
             let this = this.sub($offset) as *mut $type;
-            (*this).add_ref()
+            (*this).combox_add_ref()
         }
         unsafe extern "stdcall" fn iunknown_release(this: *mut IUnknownVPtr) -> u32 {
             let this = this.sub($offset) as *mut $type;
-            (*this).release()
+            (*this).combox_release()
         }
 
         IUnknownVTable {

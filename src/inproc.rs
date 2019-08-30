@@ -177,21 +177,23 @@ macro_rules! com_inproc_dll_module {
         #[no_mangle]
         extern "stdcall" fn DllGetClassObject(rclsid: $crate::_winapi::shared::guiddef::REFCLSID, riid: $crate::_winapi::shared::guiddef::REFIID, ppv: *mut $crate::_winapi::shared::minwindef::LPVOID) -> $crate::_winapi::shared::winerror::HRESULT {
             use com::IUnknown;
+            use com::ComBox;
+
             let rclsid = unsafe{ &*rclsid };
             if $crate::_winapi::shared::guiddef::IsEqualGUID(rclsid, &$clsid_one) {
-                let mut instance = Box::new(<$classtype_one>::new());
-                instance.add_ref();
-                let hr = instance.query_interface(riid, ppv);
-                instance.release();
-                Box::into_raw(instance);
+                let mut combox = Box::new(ComBox::new(<$classtype_one>::new()));
+                combox.combox_add_ref();
+                let hr = unsafe { combox.combox_query_interface(riid, ppv) };
+                combox.combox_release();
+                Box::into_raw(combox);
 
                 hr
             } $(else if $crate::_winapi::shared::guiddef::IsEqualGUID(rclsid, &$clsid) {
-                let mut instance = Box::new(<$classtype>::new());
-                instance.add_ref();
-                let hr = instance.query_interface(riid, ppv);
-                instance.release();
-                Box::into_raw(instance);
+                let mut combox = Box::new(ComBox::new(<$classtype>::new()));
+                combox.combox_add_ref();
+                let hr = unsafe { combox.combox_query_interface(riid, ppv) };
+                combox.combox_release();
+                Box::into_raw(combox);
 
                 hr
             })* else  {

@@ -104,6 +104,8 @@ fn main() {
 
     assert!(animal.get_interface::<dyn ICat>().is_some());
     assert!(animal.get_interface::<dyn IUnknown>().is_some());
+
+    println!("Reached this point!");
     assert!(animal.get_interface::<dyn IExample>().is_none());
     assert!(animal.get_interface::<dyn IDomesticAnimal>().is_some());
 }

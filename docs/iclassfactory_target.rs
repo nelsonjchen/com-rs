@@ -1,5 +1,5 @@
 #[com_interface(00000001-0000-0000-c000-000000000046)]
-pub trait IClassFactory: IUnknown {
+pub trait IClassFactory {
     fn create_instance(
         &mut self,
         aggr: *mut IUnknownVPtr,
@@ -53,7 +53,7 @@ pub struct IClassFactoryVTable {
 }
 pub type IClassFactoryVPtr = *const IClassFactoryVTable;
 
-pub trait IClassFactory: IUnknown {
+pub trait IClassFactory {
     fn create_instance(&mut self, aggr: *mut IUnknownVPtr, riid: REFIID, ppv: *mut *mut c_void) -> HRESULT;
     fn lock_server(&mut self, increment: BOOL) -> HRESULT;
 }

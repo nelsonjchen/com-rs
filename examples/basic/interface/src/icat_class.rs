@@ -9,7 +9,7 @@ pub const IID_ICAT_CLASS: IID = IID {
     Data4: [0x8d, 0x92, 0xd2, 0x74, 0xc7, 0x57, 0x8b, 0x53],
 };
 
-pub trait ICatClass: IUnknown {}
+pub trait ICatClass {}
 
 unsafe impl ComInterface for dyn ICatClass {
     type VTable = ICatClassVTable;

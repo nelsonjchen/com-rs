@@ -1,6 +1,6 @@
 // import "unknwn.idl";
 // [object, uuid(DF12E151-A29A-l1dO-8C2D-00BOC73925BA)]
-// interface IAnimal : IUnknown {
+// interface IAnimal  {
 //   HRESULT Eat(void);
 // }
 // [object, uuid(DF12E152-A29A-l1dO-8C2D-0080C73925BA)]

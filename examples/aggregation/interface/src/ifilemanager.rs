@@ -9,7 +9,7 @@ pub const IID_IFILE_MANAGER: IID = IID {
     Data4: [0x83, 0x51, 0x04, 0x48, 0x89, 0xd5, 0xe3, 0x7e],
 };
 
-pub trait IFileManager: IUnknown {
+pub trait IFileManager {
     fn delete_all(&mut self) -> HRESULT;
 }
 

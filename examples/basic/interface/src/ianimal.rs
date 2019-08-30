@@ -9,7 +9,7 @@ pub const IID_IANIMAL: IID = IID {
     Data4: [0x92, 0x84, 0x29, 0x1c, 0xe5, 0xa6, 0xf7, 0x71],
 };
 
-pub trait IAnimal: IUnknown {
+pub trait IAnimal {
     fn eat(&mut self) -> HRESULT;
 }
 

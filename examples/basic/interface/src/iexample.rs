@@ -9,7 +9,7 @@ pub const IID_IEXAMPLE: IID = IID {
     Data4: [0xA9, 0xF9, 0x05, 0xAC, 0x67, 0x52, 0x5E, 0x43],
 };
 
-pub trait IExample: IUnknown {}
+pub trait IExample {}
 
 unsafe impl ComInterface for dyn IExample {
     type VTable = IExampleVTable;

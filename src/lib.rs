@@ -4,6 +4,7 @@ mod iclassfactory;
 mod inproc;
 mod iunknown;
 mod runtime;
+mod combox;
 
 pub use comoutptr::ComOutPtr;
 pub use comptr::ComPtr;
@@ -11,8 +12,15 @@ pub use iclassfactory::{IClassFactory, IClassFactoryVPtr, IClassFactoryVTable, I
 pub use inproc::*;
 pub use iunknown::{IUnknown, IUnknownVPtr, IUnknownVTable, IID_IUNKNOWN};
 pub use runtime::Runtime;
+pub use combox::ComBox;
 
-use winapi::shared::{guiddef::IID, winerror::HRESULT};
+use winapi::{
+    shared::{
+        guiddef::{REFIID, IID,},
+        winerror::HRESULT
+    },
+    ctypes::c_void,
+};
 
 pub fn failed(result: HRESULT) -> bool {
     result < 0
@@ -23,6 +31,12 @@ pub fn failed(result: HRESULT) -> bool {
 pub unsafe trait ComInterface {
     type VTable;
     const IID: IID;
+}
+
+pub trait CoClass {
+    type VPointerList;
+    fn create_vtable_list() -> Self::VPointerList;
+    fn query_interface(vtbl_list: &Self::VPointerList, riid: REFIID, ppv: *mut *mut c_void) -> HRESULT;
 }
 
 // Export winapi for use by macros

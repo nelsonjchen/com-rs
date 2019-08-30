@@ -9,7 +9,7 @@ pub const IID_ISUPERMAN: IID = IID {
     Data4: [0x8a, 0xf6, 0xb9, 0x3f, 0x43, 0xe8, 0x69, 0xc8],
 };
 
-pub trait ISuperman: IUnknown {
+pub trait ISuperman {
     // [in]
     fn take_input(&mut self, in_var: u32) -> HRESULT;
 

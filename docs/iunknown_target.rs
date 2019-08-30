@@ -70,7 +70,7 @@ pub trait IUnknown {
     fn release(&mut self) -> u32;
 }
 
-impl <T: IUnknown + ComInterface + ?Sized> IUnknown for ComPtr<T> {
+impl <T: ComInterface + ?Sized> IUnknown for ComPtr<T> {
     fn query_interface(&mut self, riid: *const IID, ppv: *mut *mut c_void) -> HRESULT {
         let itf_ptr = self.into_raw() as *mut IUnknownVPtr;
         unsafe { ((**itf_ptr).QueryInterface)(itf_ptr, riid, ppv) }
@@ -90,21 +90,4 @@ impl <T: IUnknown + ComInterface + ?Sized> IUnknown for ComPtr<T> {
 unsafe impl ComInterface for IUnknown {
     type VTable = IUnknownVTable;
     const IID: IID = IID_IUNKNOWN;
-}
-
-impl<T: IUnknown + ComInterface + ?Sized> ComPtr<T> {
-    fn query_interface(&mut self, riid: *const IID, ppv: *mut *mut c_void) -> HRESULT {
-        let itf_ptr = self.into_raw() as *mut IUnknownVPtr;
-        unsafe { ((**itf_ptr).QueryInterface)(itf_ptr, riid, ppv) }
-    }
-
-    fn add_ref(&mut self) -> u32 {
-        let itf_ptr = self.into_raw() as *mut IUnknownVPtr;
-        unsafe { ((**itf_ptr).AddRef)(itf_ptr) }
-    }
-
-    fn release(&mut self) -> u32 {
-        let itf_ptr = self.into_raw() as *mut IUnknownVPtr;
-        unsafe { ((**itf_ptr).Release)(itf_ptr) }
-    }
 }
