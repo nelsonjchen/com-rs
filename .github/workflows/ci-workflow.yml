@@ -9,3 +9,21 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: test
+  build-aggregation-example:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build 
+          args: --manifest-path examples/aggregation/Cargo.toml
+  build-basic-example:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build 
+          args: --manifest-path examples/basic/Cargo.toml
+
+      
